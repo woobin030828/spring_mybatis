@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mybatis.mapper.PostMapper">
+    <insert id="insert" parameterType="PostVO">
+        INSERT INTO TBL_POST(ID, POST_TITLE, POST_CONTENT, POST_STATS, MEMBER_ID)
+        VALUES (SEQ_POST.NEXTVAL, #{postTitle}, #{postContent}, #{postStats}, #{memberId})
+    </insert>
+
+    <update id="update">
+        UPDATE TBL_POST
+        SET POST_TITLE = #{postTitle}, POST_CONTENT = #{postContent}, POST_STATS = #{postStats}
+        WHERE ID = #{id};
+    </update>
+
+    <delete id="delete">
+        DELETE FROM TBL_POST
+        WHERE ID = #{id}
+    </delete>
+
+    <select id="selectAll" resultType="PostDTO">
+        SELECT TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_READ_COUNT, TBP.POST_STATS,
+        TBP.MEMBER_ID, TBM.MEMBER_EMAIL, TBM.MEMBER_NAME
+        FROM TBL_POST TBP
+        JOIN TBL_MEMBER TBM
+        ON TBP.MEMBER_ID = TBM.ID
+    </select>
+    <select id="selectOne" parameterType="Long" resultType="PostDTO">
+        SELECT TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_READ_COUNT, TBP.POST_STATS,
+        TBP.MEMBER_ID, TBM.MEMBER_EMAIL, TBM.MEMBER_NAME
+        FROM TBL_POST TBP
+        JOIN TBL_MEMBER TBM
+        ON TBP.MEMBER_ID = TBM.ID AND TBP.ID = #{id}
+    </select>
+
+</mapper>
