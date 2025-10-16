@@ -24,12 +24,67 @@
         JOIN TBL_MEMBER TBM
         ON TBP.MEMBER_ID = TBM.ID
     </select>
+    <select id="selectAllWithOrder" parameterType="String" resultType="PostDTO">
+        SELECT TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_READ_COUNT, TBP.POST_STATS,
+        TBP.MEMBER_ID, TBM.MEMBER_EMAIL, TBM.MEMBER_NAME
+        FROM TBL_POST TBP
+        JOIN TBL_MEMBER TBM
+        ON TBP.MEMBER_ID = TBM.ID
+        ORDER BY
+        <choose>
+            <when test="order.equals('popular')">
+                TBP.POST_READ_COUNT DESC
+            </when>
+            <when test="order.equals('unPopular')">
+                TBP.POST_READ_COUNT
+            </when>
+            <otherwise>
+                TBP.ID DESC
+            </otherwise>
+        </choose>
+    </select>
     <select id="selectOne" parameterType="Long" resultType="PostDTO">
         SELECT TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_READ_COUNT, TBP.POST_STATS,
         TBP.MEMBER_ID, TBM.MEMBER_EMAIL, TBM.MEMBER_NAME
         FROM TBL_POST TBP
         JOIN TBL_MEMBER TBM
         ON TBP.MEMBER_ID = TBM.ID AND TBP.ID = #{id}
+    </select>
+
+    <update id="updateReadCount" parameterType="Long">
+        UPDATE TBL_POST
+        SET POST_READ_COUNT = POST_READ_COUNT + 1
+        WHERE ID = #{id}
+    </update>
+
+    <select id="selectAllWithParams" parameterType="Map" resultType="PostDTO">
+        SELECT
+            TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_READ_COUNT, TBP.POST_STATS,
+            TBP.MEMBER_ID, TBM.MEMBER_EMAIL, TBM.MEMBER_NAME
+        FROM TBL_POST TBP
+        JOIN TBL_MEMBER TBM
+        ON TBP.MEMBER_ID = TBM.ID
+        ORDER BY
+        <choose>
+            <when test="order.equals('popular')">
+                TBP.POST_READ_COUNT
+            </when>
+            <when test="order.equals('unPopular')">
+                TBP.POST_READ_COUNT
+            </when>
+            <otherwise>
+                TBP.ID
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="direction != null and direction.equals('asc')">
+                ASC
+            </when>
+            <otherwise>
+                DESC
+            </otherwise>
+        </choose>
+        OFFSET (#{cursor} - 1) * 10 ROWS FETCH NEXT 10 ROWS ONLY
     </select>
 
 </mapper>
